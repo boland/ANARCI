@@ -1,5 +1,7 @@
 # Run the pipeline to get the sequences, format them and build the databases
 
+set -e
+
 DIR="."
 
 # Rip the sequences from the imgt website. HTML may change in the future. 
