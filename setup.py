@@ -32,7 +32,7 @@ class CustomInstallCommand(install):
       # Remove data from HMMs generation
        try:
            shutil.rmtree("curated_alignments/")
-           shutil.rmtree("muscle_alignments/")
+           #shutil.rmtree("muscle_alignments/")
            shutil.rmtree("HMMs/")
            shutil.rmtree("IMGT_sequence_files/")
        except OSError:
@@ -46,7 +46,8 @@ setup(name='anarci',
      url='http://opig.stats.ox.ac.uk/webapps/ANARCI',
      packages=['anarci'],
      package_dir={'anarci': 'lib/python/anarci'},
-     data_files = [ ('bin', ['bin/muscle', 'bin/muscle_macOS', 'bin/ANARCI']) ],
+     #data_files = [ ('bin', ['bin/muscle', 'bin/muscle_macOS', 'bin/ANARCI']) ], # muscle3
+     data_files = [ ('bin', ['bin/ANARCI']) ], # muscle5
      include_package_data = True,
      scripts=['bin/ANARCI'],
      cmdclass={"install": CustomInstallCommand, }, # Run post-installation routine

@@ -28,6 +28,7 @@ These are chucked into curated alignments and hmmbuild used to create the HMMs.
 
 import os, sys
 from subprocess import Popen, PIPE
+import subprocess
 from FastaIO import chunkify
 
 amino_acids = sorted(list("QWERTYIPASDFGHKLCVNM"))
@@ -169,32 +170,39 @@ def format_c_genes(calignments, gene_name=""):
 
 def format_j_genes(jalignments):
 
-    reference = ("WFAYWGQGTLVTVSA", 4  , 19 )
-    #                 seq           start  end
+    #reference = ("WFAYWGQGTLVTVSA", 4  , 19 ) # (sequence, start, end)
+    reference = ("WFAYWGQ", 4  , 19 ) # (sequence, start, end)
 
     ffile = write_fasta(jalignments)
     al_filename = os.path.join( file_path, "muscle_alignments", "all_js_aligned.fasta" )
     
-    if sys.platform == "darwin":
-        pr = Popen( [ "muscle_macOS", "-in", ffile, "-gapopen", "-10", "-out", al_filename, ], stdout=PIPE, stderr=PIPE )
-    else:
-        pr = Popen( [ "muscle", "-in", ffile, "-gapopen", "-10", "-out", al_filename, ], stdout=PIPE, stderr=PIPE )
-    o, e = pr.communicate()
+    #######################################################
+    # if sys.platform == "darwin":
+    #     pr = Popen( [ "muscle_macOS", "-in", ffile, "-gapopen", "-10", "-out", al_filename, ], stdout=PIPE, stderr=PIPE )
+    # else:
+    #     pr = Popen( [ "muscle", "-in", ffile, "-gapopen", "-10", "-out", al_filename, ], stdout=PIPE, stderr=PIPE )
+    # o, e = pr.communicate()
+    # aligned = read_fasta( al_filename )
+    # new_jalignments = {}
+    #######################################################
+    cmd = ['muscle', '-align', ffile, '-output', al_filename]
+    subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     aligned = read_fasta( al_filename )
-    new_jalignments = {} 
+    new_jalignments = {}
 
     # Find the reference sequence and what we need to do to map
     for name, sequence in aligned:
         if name == "Mus|H|Mus musculus|IGHJ3*01":
             ref_aligned = sequence
             break
+    
     start = ref_aligned.index( reference[0] )
     if start > reference[1]:
         START = start+1-reference[1]
     else:
         START = 0
     END = start + 15
-
 
     for name, sequence in aligned:
         species, chain_type, id1, id2 =  name.strip(">").split("|")
